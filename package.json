@@ -1,0 +1,17 @@
+{
+  "name": "sst-bug-repro",
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "private": true,
+  "scripts": {
+    "deploy": "sst deploy",
+    "dev": "sst dev"
+  },
+  "dependencies": {
+    "sst": "/Users/abhishekchadha/Desktop/repos/sst"
+  }
+}
