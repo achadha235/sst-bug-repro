@@ -55,13 +55,19 @@ rm -rf .sst
 Run `sst dev` again. You should see the stack deploy correctly.
 
 ## Observations
-
-    - Seems like a clean intial deploy works
-    - Somehow changing the stack puts the function archives into a weird state
-    - Simply re-creating the stack does not work, you have to delete the stack and the `.sst` directory and run `sst dev` again
-    - Inspecting the function archives in `.sst/artifacts` shows there is some archiving issue
+- Seems like a clean intial deploy works
+- Somehow changing the stack puts the function archives into a weird state
+- Simply re-creating the stack does not work, you have to delete the stack and the `.sst` directory and run `sst dev` again
+- Inspecting the function archives in `.sst/artifacts` shows there is some archiving issue
 
 ```
+╭─   ~/Desktop/sst-bug-repro   main ?8 ··································································································· ▼  base  12:15:09 AM ─╮
+╰─❯ zip -T ./.sst/artifacts/dev-bridge-us-west-2/code.zip                                                                                                             ─╯
+file #3:  bad zipfile offset (local header sig):  6732512
+test of ./.sst/artifacts/dev-bridge-us-west-2/code.zip FAILED
+
+zip error: Zip file invalid, could not spawn unzip, or wrong unzip (original files unmodified)
+
 ╭─   ~/Desktop/sst-bug-repro   main ?8 ··································································································· ▼  base  12:15:16 AM ─╮
 ╰─❯ zip -F ./.sst/artifacts/dev-bridge-us-west-2/code.zip --out fixed.zip                                                                                             ─╯
 Fix archive (-F) - assume mostly intact archive
@@ -72,3 +78,9 @@ Zip entry offsets do not need adjusting
         zip warning: Did not find entry for index.mjs
         zip warning: bad - skipping: index.mjs
 ```
+
+## Thoughts
+
+I think the issue is related to the fact that the function archives are not being produced correctly.
+
+Feels like something is going wrong here https://github.com/anomalyco/sst/blob/dev/platform/src/components/aws/function.ts#L2439-L2538 possibly between the write stream getting closed, the promise resolving and causing the upload to start, maybe before the `.finalize()` finishes, and then once there is a bad file cached in S3 its just perpetually failing. Not sure.
