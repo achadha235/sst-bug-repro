@@ -15,7 +15,8 @@ export default $config({
 
     const environment = {
       SECRET_KEY: secret.value,
-      HELLO: "world", // Uncomment this after doing an initial deploy to trigger a change
+      // NOTE: Uncomment the line below after doing an initial deploy to trigger a change
+      // HELLO: "world",
     };
 
     const link = [secret];
